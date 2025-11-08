@@ -1,6 +1,6 @@
-# KrishiKavach
+# KrishiChakra
 
-## We makers of KrishiKavach made most of the ML and AI's that are useful for farmers available in one place.
+## We makers of KrishiChakra made most of the ML and AI's that are useful for farmers available in one place.
 
 ### Project summary
 
