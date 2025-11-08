@@ -130,9 +130,23 @@ def predict_crop():
         top_3_crops = [crop_encoder.classes_[i] for i in top_3_indices]
         top_3_probabilities = [probabilities[i] for i in top_3_indices]
         
+        # Get the predicted crop name
+        if isinstance(prediction, (int, np.integer)):
+            predicted_crop = crop_encoder.classes_[prediction]
+            confidence = float(probabilities[prediction])
+        else:
+            # If prediction is already a class name
+            predicted_crop = str(prediction)
+            # Find the confidence for this prediction
+            if predicted_crop in crop_encoder.classes_:
+                crop_index = np.where(crop_encoder.classes_ == predicted_crop)[0][0]
+                confidence = float(probabilities[crop_index])
+            else:
+                confidence = float(max(probabilities))
+        
         return jsonify({
-            'recommended_crop': crop_encoder.classes_[prediction],
-            'confidence': float(probabilities[prediction]),
+            'recommended_crop': predicted_crop,
+            'confidence': confidence,
             'top_3_crops': top_3_crops,
             'top_3_confidences': [round(prob, 3) for prob in top_3_probabilities]
         })

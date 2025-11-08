@@ -3,15 +3,15 @@
 {% block title %}Production Estimation - KrishiKavach{% endblock %}
 
 {% block content %}
-<div class="container my-5">
+<div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            <div class="card form-card-glass">
+            <div class="card">
                 <div class="card-body">
-                    <h2 class="card-title text-center text-white mb-4">
-                        <i class="fas fa-chart-line me-2 text-primary"></i>Production Estimation
+                    <h2 class="card-title text-center mb-4">
+                        <i class="fas fa-chart-line me-2"></i>Production Estimation
                     </h2>
-                    <p class="text-center text-light mb-5">
+                    <p class="text-center mb-5">
                         Estimate your crop production based on field conditions and inputs.
                     </p>
                     <form id="productionForm">
@@ -82,52 +82,52 @@
         </div>
     </div>
 
-    <div class="row mt-5" id="results" style="display: none;">
+    <div class="row mt-4" id="results" style="display: none;">
         <div class="col-lg-10 mx-auto">
-            <div class="card result-card-glass">
+            <div class="card">
                 <div class="card-body">
-                    <h3 class="card-title text-center text-white mb-4">
-                        <i class="fas fa-chart-bar me-2 text-primary"></i>Production Estimation Results
+                    <h3 class="card-title text-center mb-4">
+                        <i class="fas fa-chart-bar me-2"></i>Production Estimation Results
                     </h3>
                     <div class="row text-center">
-                        <div class="col-md-6 border-end border-secondary">
-                            <h5 class="text-light">Predicted Yield per Hectare</h5>
-                            <h2 id="yieldPerHectare" class="display-4 fw-bold text-primary"></h2>
-                            <p class="text-light">kg per hectare</p>
+                        <div class="col-md-6 border-end">
+                            <h5>Predicted Yield per Hectare</h5>
+                            <h2 id="yieldPerHectare" class="display-4"></h2>
+                            <p>kg per hectare</p>
                         </div>
                         <div class="col-md-6">
-                            <h5 class="text-light">Total Predicted Production</h5>
-                            <h2 id="totalProduction" class="display-4 fw-bold text-primary"></h2>
-                            <p class="text-light">kg total</p>
+                            <h5>Total Predicted Production</h5>
+                            <h2 id="totalProduction" class="display-4"></h2>
+                            <p>kg total</p>
                         </div>
                     </div>
-                    <hr class="border-secondary my-4">
-                    <div class="alert alert-info-glass mt-4">
-                        <h5 class="text-white"><i class="fas fa-lightbulb me-2"></i>Optimization Tips</h5>
-                        <ul class="list-unstyled text-light">
-                            <li><i class="fas fa-check-circle me-2 text-primary"></i>Consider adjusting fertilizer ratios based on soil test results.</li>
-                            <li><i class="fas fa-check-circle me-2 text-primary"></i>Monitor weather conditions for optimal planting timing.</li>
-                            <li><i class="fas fa-check-circle me-2 text-primary"></i>Implement proper irrigation scheduling.</li>
-                            <li><i class="fas fa-check-circle me-2 text-primary"></i>Regular field monitoring for pest and disease management.</li>
+                    <hr class="my-4">
+                    <div class="alert mt-4">
+                        <h5><i class="fas fa-lightbulb me-2"></i>Optimization Tips</h5>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check-circle me-2"></i>Consider adjusting fertilizer ratios based on soil test results.</li>
+                            <li><i class="fas fa-check-circle me-2"></i>Monitor weather conditions for optimal planting timing.</li>
+                            <li><i class="fas fa-check-circle me-2"></i>Implement proper irrigation scheduling.</li>
+                            <li><i class="fas fa-check-circle me-2"></i>Regular field monitoring for pest and disease management.</li>
                         </ul>
                     </div>
                     <div class="row mt-4 text-center">
                         <div class="col-md-4">
-                            <div class="card-body-glass p-3">
-                                <h6 class="text-success">Good Conditions</h6>
-                                <p class="text-light mb-0">Yield may increase by 10-15%</p>
+                            <div class="card p-3">
+                                <h6>Good Conditions</h6>
+                                <p class="mb-0">Yield may increase by 10-15%</p>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="card-body-glass p-3">
-                                <h6 class="text-warning">Average Conditions</h6>
-                                <p class="text-light mb-0">Yield as predicted</p>
+                            <div class="card p-3">
+                                <h6>Average Conditions</h6>
+                                <p class="mb-0">Yield as predicted</p>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="card-body-glass p-3">
-                                <h6 class="text-danger">Poor Conditions</h6>
-                                <p class="text-light mb-0">Yield may decrease by 10-20%</p>
+                            <div class="card p-3">
+                                <h6>Poor Conditions</h6>
+                                <p class="mb-0">Yield may decrease by 10-20%</p>
                             </div>
                         </div>
                     </div>
