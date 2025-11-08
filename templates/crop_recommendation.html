@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Crop Recommendation - KrishiKavach{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h2 class="fw-bold"><i class="fas fa-leaf text-success"></i> Crop Recommendation</h2>
+    <p class="fs-5 text-muted">Enter your field conditions to receive an AI-powered crop recommendation.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header text-center">
+                Enter Your Field Data
+            </div>
+            <div class="card-body p-4">
+                <form id="cropForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="n" class="form-label">Nitrogen (N)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-atom"></i></span>
+                                <input type="number" class="form-control" id="n" name="n" placeholder="e.g., 90" step="0.1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="p" class="form-label">Phosphorus (P)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-atom"></i></span>
+                                <input type="number" class="form-control" id="p" name="p" placeholder="e.g., 42" step="0.1" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="k" class="form-label">Potassium (K)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-atom"></i></span>
+                                <input type="number" class="form-control" id="k" name="k" placeholder="e.g., 43" step="0.1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="temperature" class="form-label">Temperature (°C)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-thermometer-half"></i></span>
+                                <input type="number" class="form-control" id="temperature" name="temperature" placeholder="e.g., 20.8" step="0.1" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="humidity" class="form-label">Humidity (%)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-tint"></i></span>
+                                <input type="number" class="form-control" id="humidity" name="humidity" placeholder="e.g., 82" step="0.1" min="0" max="100" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="ph" class="form-label">pH Level</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-vial"></i></span>
+                                <input type="number" class="form-control" id="ph" name="ph" placeholder="e.g., 6.5" step="0.1" min="0" max="14" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="rainfall" class="form-label">Rainfall (mm)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-cloud-rain"></i></span>
+                                <input type="number" class="form-control" id="rainfall" name="rainfall" placeholder="e.g., 202.9" step="0.1" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-magic"></i> Get Recommendation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5 justify-content-center" id="results" style="display: none;">
+    <div class="col-lg-8">
+        <div class="card result-card">
+            <div class="card-body">
+                <h4 class="card-title text-center mb-4">Recommendation Results</h4>
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center">
+                        <h6 class="text-success">Recommended Crop</h6>
+                        <h2 id="recommendedCrop" class="display-5 fw-bold text-white"></h2>
+                        <p class="text-muted">Confidence: <strong id="confidence" class="text-white"></strong>%</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Top 3 Alternatives</h6>
+                        <ul id="topCrops" class="list-group list-group-flush">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('cropForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        showLoading();
+        
+        const formData = {
+            n: document.getElementById('n').value,
+            p: document.getElementById('p').value,
+            k: document.getElementById('k').value,
+            temperature: document.getElementById('temperature').value,
+            humidity: document.getElementById('humidity').value,
+            ph: document.getElementById('ph').value,
+            rainfall: document.getElementById('rainfall').value
+        };
+        
+        try {
+            const response = await fetch('/predict_crop', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.error) {
+                alert(`Error: ${result.error}`);
+            } else {
+                document.getElementById('recommendedCrop').textContent = result.recommended_crop;
+                document.getElementById('confidence').textContent = result.confidence;
+                
+                const topCropsList = document.getElementById('topCrops');
+                topCropsList.innerHTML = '';
+                result.top_3_crops.forEach(crop => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center bg-transparent text-white';
+                    li.innerHTML = `
+                        ${crop[0]}
+                        <span class="badge bg-success rounded-pill">${crop[1]}%</span>
+                    `;
+                    topCropsList.appendChild(li);
+                });
+                
+                document.getElementById('results').style.display = 'block';
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (error) {
+            alert('An error occurred while generating the recommendation. Please try again.');
+        } finally {
+            hideLoading();
+        }
+    });
+</script>
+{% endblock %}
