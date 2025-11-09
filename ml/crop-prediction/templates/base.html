@@ -309,6 +309,189 @@
             border-color: #ff4757;
             background: linear-gradient(135deg, rgba(255, 71, 87, 0.1) 0%, rgba(255, 107, 53, 0.1) 100%);
         }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            /* Fix navbar brand size */
+            .navbar-brand {
+                font-size: 1.4rem;
+            }
+            
+            /* Reduce navbar padding */
+            .navbar {
+                padding: 0.5rem 0;
+            }
+            
+            /* Fix main content padding for mobile */
+            main {
+                padding-top: 70px;
+                padding-bottom: 40px;
+            }
+            
+            /* Reduce hero section padding */
+            .hero-section {
+                padding: 60px 0;
+                margin-bottom: 40px;
+            }
+            
+            /* Reduce hero title font size */
+            .hero-section h1 {
+                font-size: 2.5rem;
+            }
+            
+            /* Fix page titles from being cut off */
+            h2 {
+                font-size: 1.8rem;
+                word-wrap: break-word;
+            }
+            
+            /* Reduce card padding on mobile */
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            /* Fix card header font size */
+            .card-header {
+                font-size: 1.1rem;
+                padding: 1rem;
+            }
+            
+            /* Ensure gradients work on mobile */
+            body {
+                background-attachment: fixed;
+                background-size: cover;
+            }
+            
+            .card {
+                background-attachment: fixed;
+            }
+            
+            /* Fix form inputs on mobile */
+            .form-control, .form-select {
+                padding: 10px 12px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            /* Reduce button size on mobile */
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            /* Fix navbar toggler position */
+            .navbar-toggler {
+                padding: 0.25rem 0.5rem;
+                font-size: 1rem;
+            }
+            
+            /* Ensure proper spacing in navbar nav */
+            .navbar-nav {
+                margin-top: 0.5rem;
+            }
+            
+            .nav-item {
+                margin: 0.25rem 0;
+            }
+            
+            .nav-link {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 375px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+            
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+        }
+
+        /* Very small devices */
+        @media (max-width: 320px) {
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+            
+            .hero-section h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            .container {
+                padding: 0 0.5rem;
+            }
+        }
+
+        /* Fix gradient rendering on mobile devices */
+        @supports (-webkit-touch-callout: none) {
+            /* iOS specific fixes */
+            body {
+                background-attachment: scroll;
+                background-size: auto 100vh;
+            }
+            
+            .card {
+                background-attachment: scroll;
+            }
+            
+            .hero-section::before {
+                background-attachment: scroll;
+            }
+        }
+
+        /* Android Chrome specific fixes */
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            .card {
+                transform: translateZ(0); /* Force hardware acceleration */
+            }
+            
+            .btn-primary {
+                transform: translateZ(0);
+            }
+        }
+
+        /* Additional mobile menu fixes */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                background: rgba(10, 10, 10, 0.98);
+                backdrop-filter: blur(20px);
+                border-radius: 12px;
+                margin-top: 0.5rem;
+                padding: 1rem;
+                border: 1px solid var(--border-color);
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.75rem 1rem;
+                margin: 0.25rem 0;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+            }
+            
+            .navbar-nav .nav-link:hover {
+                background: rgba(0, 255, 136, 0.1);
+                transform: translateX(5px);
+            }
+            
+            .navbar-nav .nav-link::after {
+                display: none; /* Remove the hover line effect on mobile */
+            }
+        }
     </style>
 </head>
 <body>
@@ -334,6 +517,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/production-estimation"><i class="fas fa-tractor"></i> Production</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pest-detection"><i class="fas fa-bug"></i> Pest</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chatbot"><i class="fas fa-robot"></i> Chatbot</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -352,7 +541,7 @@
 
     <footer class="py-4 mt-5">
         <div class="container text-center">
-            <p>&copy; 2024 KrishiKavach. AI-Powered Farming for a Sustainable Future.</p>
+            <p>&copy; 2025 KrishiKavach. AI-Powered Farming for a Sustainable Future.</p>
         </div>
     </footer>
 
@@ -364,6 +553,81 @@
         
         function hideLoading() {
             document.getElementById('loading').style.display = 'none';
+        }
+        
+        function showAlert(message, type = 'info') {
+            // Create backdrop for background effect
+            const backdrop = document.createElement('div');
+            backdrop.style.position = 'fixed';
+            backdrop.style.top = '0';
+            backdrop.style.left = '0';
+            backdrop.style.width = '100%';
+            backdrop.style.height = '100%';
+            backdrop.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            backdrop.style.zIndex = '9998';
+            
+            // Create alert element
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '100px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.style.minWidth = '350px';
+            alertDiv.style.maxWidth = '500px';
+            alertDiv.style.boxShadow = '0 8px 32px rgba(0,0,0,0.3)';
+            alertDiv.style.border = '1px solid rgba(255,255,255,0.2)';
+            alertDiv.style.background = 'linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(30,30,30,0.95) 100%)';
+            alertDiv.style.color = 'white';
+            alertDiv.style.padding = '1.5rem';
+            alertDiv.style.borderRadius = '16px';
+            alertDiv.style.fontSize = '1.1rem';
+            alertDiv.style.fontWeight = '500';
+            
+            // Add icon based on alert type
+            let icon = '';
+            switch(type) {
+                case 'success':
+                    icon = '<i class="fas fa-check-circle me-2"></i>';
+                    break;
+                case 'danger':
+                    icon = '<i class="fas fa-exclamation-triangle me-2"></i>';
+                    break;
+                case 'warning':
+                    icon = '<i class="fas fa-exclamation-circle me-2"></i>';
+                    break;
+                case 'info':
+                    icon = '<i class="fas fa-info-circle me-2"></i>';
+                    break;
+                default:
+                    icon = '<i class="fas fa-info-circle me-2"></i>';
+            }
+            
+            alertDiv.innerHTML = `
+                ${icon}${message}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close" style="filter: invert(1);"></button>
+            `;
+            
+            // Add to body
+            document.body.appendChild(backdrop);
+            document.body.appendChild(alertDiv);
+            
+            // Handle backdrop click to dismiss
+            backdrop.addEventListener('click', () => {
+                backdrop.remove();
+                alertDiv.remove();
+            });
+            
+            // Handle alert close button
+            alertDiv.addEventListener('close.bs.alert', () => {
+                backdrop.remove();
+            });
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                if (backdrop.parentNode) backdrop.remove();
+                if (alertDiv.parentNode) alertDiv.remove();
+            }, 5000);
         }
     </script>
     

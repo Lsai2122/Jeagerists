@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+
+{% block title %}Pest Detection - Farmer's Assistant{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-bug text-danger"></i> Pest & Disease Detection Tool
+        </h2>
+        <p class="text-center text-muted mb-5">
+            Upload images of your affected crops and get AI-powered pest/disease analysis
+        </p>
+    </div>
+</div>
+
+<!-- Image Upload Section -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-camera"></i> Upload Crop Image
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="imagePestForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="pestImage" class="form-label">
+                            <i class="fas fa-image"></i> Select Image
+                        </label>
+                        <input type="file" class="form-control" id="pestImage" name="pestImage" 
+                               accept="image/*" required>
+                        <div class="form-text">Upload a clear image of the affected plant part (leaf, stem, fruit)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="imageLocation" class="form-label">
+                            <i class="fas fa-map-marker-alt"></i> Location
+                        </label>
+                        <input type="text" class="form-control" id="imageLocation" name="location" 
+                               placeholder="Enter your village/district" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div id="imagePreview" class="text-center" style="display: none;">
+                            <img id="previewImg" class="img-fluid rounded" style="max-height: 300px;">
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="fas fa-search"></i> Analyze Image
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Text-based Analysis (Alternative) -->
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-keyboard"></i> Or Describe Your Problem
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="textPestForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cropType" class="form-label">
+                                <i class="fas fa-leaf"></i> Crop Type
+                            </label>
+                            <select class="form-control" id="cropType" name="cropType" required>
+                                <option value="">Select your crop</option>
+                                <option value="rice">Rice</option>
+                                <option value="wheat">Wheat</option>
+                                <option value="tomato">Tomato</option>
+                                <option value="potato">Potato</option>
+                                <option value="corn">Corn</option>
+                                <option value="cotton">Cotton</option>
+                                <option value="sugarcane">Sugarcane</option>
+                                <option value="onion">Onion</option>
+                                <option value="brinjal">Brinjal</option>
+                                <option value="chili">Chili</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="location" class="form-label">
+                                <i class="fas fa-map-marker-alt"></i> Location
+                            </label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   placeholder="Enter your village/district" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="symptoms" class="form-label">
+                            <i class="fas fa-stethoscope"></i> Symptoms Observed
+                        </label>
+                        <textarea class="form-control" id="symptoms" name="symptoms" rows="3" 
+                                  placeholder="Describe what you see: yellowing leaves, spots, wilting, holes in leaves, insects, etc." required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="weather" class="form-label">
+                            <i class="fas fa-cloud-sun"></i> Recent Weather Conditions
+                        </label>
+                        <textarea class="form-control" id="weather" name="weather" rows="2" 
+                                  placeholder="e.g., Heavy rainfall last week, very humid, temperature around 30°C" required></textarea>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fas fa-search"></i> Analyze Problem
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Results Section -->
+<div class="row mt-4" id="results" style="display: none;">
+    <div class="col-12">
+        <div class="card result-card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-diagnosis"></i> Analysis Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-danger">Detected Issue:</h6>
+                        <h3 id="pestDisease" class="text-danger fw-bold"></h3>
+                        <p class="text-muted">Plant: <span id="plantType"></span></p>
+                        <p class="text-muted">Confidence: <span id="confidence"></span></p>
+                        <p class="text-muted">Severity: <span id="severity"></span>/10</p>
+                        <div id="healthStatus" class="mb-3"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Quick Actions:</h6>
+                        <div id="quickActions" class="d-grid gap-2">
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-prescription-bottle"></i> Treatment:</h6>
+                        <p id="treatment" class="bg-light p-3 rounded"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-shield-alt"></i> Prevention:</h6>
+                        <p id="prevention" class="bg-light p-3 rounded"></p>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6><i class="fas fa-info-circle"></i> Additional Recommendations:</h6>
+                        <ul id="recommendations" class="list-group list-group-flush">
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="row mt-3" id="aiStatus" style="display: none;">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-robot"></i> <strong>AI Analysis:</strong> This result was generated using advanced AI image analysis for accurate diagnosis.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top 3 Predictions -->
+<div class="row mt-4" id="topPredictions" style="display: none;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list-ol"></i> Top 3 Possible Issues
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="predictionsList" class="row">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Analysis Tips -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-lightbulb"></i> Image Capture Tips
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-camera"></i> Good Lighting:</h6>
+                        <p class="small">Take photos in natural daylight, avoid shadows and harsh lighting</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-search"></i> Focus:</h6>
+                        <p class="small">Ensure the affected area is clearly visible and in focus</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-expand"></i> Multiple Angles:</h6>
+                        <p class="small">Capture different parts - leaves, stems, fruits separately</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Image preview functionality
+    document.getElementById('pestImage').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Image form submission
+    document.getElementById('imagePestForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        const imageFile = document.getElementById('pestImage').files[0];
+        const location = document.getElementById('imageLocation').value;
+        
+        if (!imageFile) {
+            showAlert('Please select an image', 'warning');
+            return;
+        }
+        
+        formData.append('image', imageFile);
+        formData.append('location', location);
+        
+        showLoading();
+        
+        try {
+            const response = await fetch('/predict_pest_image', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.error) {
+                showAlert(result.error, 'danger');
+            } else {
+                displayImageResults(result);
+                showAlert('Image analysis completed successfully!', 'success');
+            }
+        } catch (error) {
+            showAlert('Error analyzing image. Please try again.', 'danger');
+        }
+        
+        hideLoading();
+    });
+
+    // Text form submission (existing functionality)
+    document.getElementById('textPestForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        showLoading();
+        
+        const formData = {
+            crop_type: document.getElementById('cropType').value,
+            symptoms: document.getElementById('symptoms').value,
+            location: document.getElementById('location').value,
+            weather_conditions: document.getElementById('weather').value
+        };
+        
+        try {
+            const response = await fetch('/predict_pest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.error) {
+                showAlert(result.error, 'danger');
+            } else {
+                displayTextResults(result);
+                showAlert('Pest/disease analysis completed successfully!', 'success');
+            }
+        } catch (error) {
+            showAlert('Error analyzing pest/disease. Please try again.', 'danger');
+        }
+        
+        hideLoading();
+    });
+
+    function displayImageResults(result) {
+        // Display main results
+        document.getElementById('pestDisease').textContent = result.pest_disease;
+        document.getElementById('plantType').textContent = result.plant_type;
+        document.getElementById('confidence').textContent = result.confidence;
+        document.getElementById('severity').textContent = result.severity;
+        document.getElementById('treatment').textContent = result.treatment;
+        document.getElementById('prevention').textContent = result.prevention;
+        
+        // Health status
+        const healthStatus = document.getElementById('healthStatus');
+        if (result.is_healthy) {
+            healthStatus.innerHTML = '<span class="badge bg-success fs-6">✓ Plant appears healthy</span>';
+        } else {
+            healthStatus.innerHTML = '<span class="badge bg-danger fs-6">⚠ Issue detected</span>';
+        }
+        
+        // Quick actions
+        const quickActions = document.getElementById('quickActions');
+        quickActions.innerHTML = `
+            <button class="btn btn-outline-danger mb-2" onclick="alert('Contact your local agricultural officer')">
+                <i class="fas fa-phone"></i> Contact Expert
+            </button>
+            <button class="btn btn-outline-warning mb-2" onclick="alert('Save this analysis for future reference')">
+                <i class="fas fa-save"></i> Save Report
+            </button>
+        `;
+        
+        // Recommendations
+        const recommendationsList = document.getElementById('recommendations');
+        recommendationsList.innerHTML = '';
+        if (result.recommendations) {
+            result.recommendations.forEach(rec => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.innerHTML = `<i class="fas fa-check-circle text-success me-2"></i>${rec}`;
+                recommendationsList.appendChild(li);
+            });
+        }
+        
+        // Show AI status
+        document.getElementById('aiStatus').style.display = 'block';
+        
+        // Display top 3 predictions
+        if (result.top_3_predictions) {
+            displayTopPredictions(result.top_3_predictions);
+        }
+        
+        // Show results
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('topPredictions').style.display = 'block';
+        
+        // Scroll to results
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function displayTextResults(result) {
+        // Similar to displayImageResults but for text-based analysis
+        displayImageResults(result); // Reuse the same display logic
+    }
+
+    function displayTopPredictions(predictions) {
+        const predictionsList = document.getElementById('predictionsList');
+        predictionsList.innerHTML = '';
+        
+        predictions.forEach((pred, index) => {
+            const div = document.createElement('div');
+            div.className = 'col-md-4 mb-3';
+            div.innerHTML = `
+                <div class="card h-100 ${index === 0 ? 'border-danger' : 'border-secondary'}">
+                    <div class="card-body text-center">
+                        <h5 class="card-title ${index === 0 ? 'text-danger' : 'text-secondary'}">
+                            #${index + 1}
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">${pred.plant}</h6>
+                        <p class="card-text">
+                            <strong>${pred.condition}</strong><br>
+                            <small class="text-muted">${(pred.confidence * 100).toFixed(1)}% confidence</small>
+                        </p>
+                    </div>
+                </div>
+            `;
+            predictionsList.appendChild(div);
+        });
+    }
+</script>
+{% endblock %}
