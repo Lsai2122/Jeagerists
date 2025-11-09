@@ -230,6 +230,41 @@
         </div>
     </div>
 </div>
+
+<!-- Floating Chatbot Button -->
+<div id="chatbotFloatBtn" class="position-fixed bottom-0 end-0 m-4" style="z-index: 1050;">
+    <button class="btn btn-primary btn-lg rounded-circle shadow-lg" onclick="toggleChatbot()" style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--accent-green), var(--accent-blue)); border: none;">
+        <i class="fas fa-robot"></i>
+    </button>
+</div>
+
+<!-- Embedded Chatbot -->
+<div id="embeddedChatbot" class="position-fixed bottom-0 end-0 m-4" style="width: 350px; height: 500px; display: none; z-index: 1049;">
+    <div class="card h-100 shadow-lg" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+        <div class="card-header d-flex justify-content-between align-items-center py-2" style="background: linear-gradient(135deg, var(--accent-green), var(--accent-blue)); border-bottom: 1px solid var(--border-color);">
+            <h6 class="mb-0 text-white">
+                <i class="fas fa-robot me-1"></i> AI Assistant
+            </h6>
+            <button type="button" class="btn-close btn-close-white" onclick="toggleChatbot()"></button>
+        </div>
+        <div class="card-body p-0 d-flex flex-column">
+            <div id="chatMessagesEmbedded" class="flex-grow-1 p-3" style="height: 350px; overflow-y: auto; background: var(--bg-secondary);">
+                <div class="text-center text-muted py-3">
+                    <i class="fas fa-comments fa-2x mb-2 opacity-50"></i>
+                    <p class="small mb-0">Ask me about pest detection, crop issues, or farming advice!</p>
+                </div>
+            </div>
+            <div class="p-2 border-top" style="border-color: var(--border-color);">
+                <form id="chatFormEmbedded" class="d-flex gap-1">
+                    <input type="text" id="messageInputEmbedded" class="form-control form-control-sm" placeholder="Ask about pests..." style="background: var(--bg-input); border-color: var(--border-color); color: var(--text-primary);">
+                    <button type="submit" class="btn btn-primary btn-sm" style="background: var(--accent-green); border: none;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -407,6 +442,173 @@
             `;
             predictionsList.appendChild(div);
         });
+    }
+
+    // Chatbot functionality for pest detection page
+    function toggleChatbot() {
+        const chatbot = document.getElementById('embeddedChatbot');
+        const floatBtn = document.getElementById('chatbotFloatBtn');
+        
+        if (chatbot.style.display === 'none') {
+            chatbot.style.display = 'block';
+            floatBtn.style.display = 'none';
+        } else {
+            chatbot.style.display = 'none';
+            floatBtn.style.display = 'block';
+        }
+    }
+
+    // Embedded chatbot functionality
+    document.getElementById('chatFormEmbedded').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const messageInput = document.getElementById('messageInputEmbedded');
+        const message = messageInput.value.trim();
+        
+        if (!message) return;
+        
+        // Add user message to chat
+        addEmbeddedMessage(message, 'user');
+        messageInput.value = '';
+        
+        // Show typing indicator
+        showEmbeddedTypingIndicator();
+        
+        try {
+            const response = await fetch('/chatbot/api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    language: 'en' // Default to English, can be extended for language support
+                })
+            });
+            
+            const result = await response.json();
+            removeEmbeddedTypingIndicator();
+            
+            if (result.error) {
+                addEmbeddedMessage('Sorry, I encountered an error. Please try again.', 'bot');
+            } else {
+                addEmbeddedMessage(result.response, 'bot');
+            }
+        } catch (error) {
+            removeEmbeddedTypingIndicator();
+            addEmbeddedMessage('Sorry, I couldn\'t process your request. Please try again.', 'bot');
+        }
+    });
+
+    function addEmbeddedMessage(message, sender) {
+        const chatMessages = document.getElementById('chatMessagesEmbedded');
+        
+        // Remove initial message if present
+        const initialMessage = chatMessages.querySelector('.text-center');
+        if (initialMessage) {
+            initialMessage.remove();
+        }
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
+        
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                ${message}
+            </div>
+            <div class="message-time">${time}</div>
+        `;
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showEmbeddedTypingIndicator() {
+        const chatMessages = document.getElementById('chatMessagesEmbedded');
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-message bot-message';
+        typingDiv.id = 'embeddedTypingIndicator';
+        typingDiv.innerHTML = `
+            <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        `;
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function removeEmbeddedTypingIndicator() {
+        const typingIndicator = document.getElementById('embeddedTypingIndicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+
+    // Auto-open chatbot when pest detection results are shown
+    function displayImageResults(result) {
+        // Display main results
+        document.getElementById('pestDisease').textContent = result.pest_disease;
+        document.getElementById('plantType').textContent = result.plant_type;
+        document.getElementById('confidence').textContent = result.confidence;
+        document.getElementById('severity').textContent = result.severity;
+        document.getElementById('treatment').textContent = result.treatment;
+        document.getElementById('prevention').textContent = result.prevention;
+        
+        // Health status
+        const healthStatus = document.getElementById('healthStatus');
+        if (result.is_healthy) {
+            healthStatus.innerHTML = '<span class="badge bg-success fs-6">✓ Plant appears healthy</span>';
+        } else {
+            healthStatus.innerHTML = '<span class="badge bg-danger fs-6">⚠ Issue detected</span>';
+        }
+        
+        // Quick actions
+        const quickActions = document.getElementById('quickActions');
+        quickActions.innerHTML = `
+            <button class="btn btn-outline-danger mb-2" onclick="alert('Contact your local agricultural officer')">
+                <i class="fas fa-phone"></i> Contact Expert
+            </button>
+            <button class="btn btn-outline-warning mb-2" onclick="alert('Save this analysis for future reference')">
+                <i class="fas fa-save"></i> Save Report
+            </button>
+        `;
+        
+        // Recommendations
+        const recommendationsList = document.getElementById('recommendations');
+        recommendationsList.innerHTML = '';
+        if (result.recommendations) {
+            result.recommendations.forEach(rec => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.innerHTML = `<i class="fas fa-check-circle text-success me-2"></i>${rec}`;
+                recommendationsList.appendChild(li);
+            });
+        }
+        
+        // Show AI status
+        document.getElementById('aiStatus').style.display = 'block';
+        
+        // Display top 3 predictions
+        if (result.top_3_predictions) {
+            displayTopPredictions(result.top_3_predictions);
+        }
+        
+        // Show results
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('topPredictions').style.display = 'block';
+        
+        // Scroll to results
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        
+        // Auto-open chatbot with pest-related context
+        setTimeout(() => {
+            toggleChatbot();
+            addEmbeddedMessage(`I detected ${result.pest_disease} in your crop image. Would you like to know more about treatment options or have other questions about this issue?`, 'bot');
+        }, 1000);
     }
 </script>
 {% endblock %}
